@@ -119,7 +119,6 @@ void loop() {
       Serial.println (heatCall);
       // delay(1000);
 
-      // Code to be debounced:
       handleHeatCall(heatCall);
     }
   }
