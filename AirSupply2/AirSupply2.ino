@@ -65,32 +65,7 @@ void setup() {
   digitalWrite(rlyCloseVent, LOW);  // makes sure that the relay is off
 }
 
-void loop() {
-
-  //int ventCall= digitalRead(otherCallPin);
-  //int maxOpenLimitSwReading = digitalRead(maxOpenLimitSw);
-  //int maxClosedLimitSwReading = digitalRead();
-  //int midLimitSwReading = digitalRead();
-
-  // check for heat call, debounce signal
-
-  int heatCallReading = digitalRead(heatCallPin);
-  if (heatCallReading != lastHeatCallReading) {       //if the pin's reading does not match previous reading, record the time
-    lastDebounceTime = millis();
-  }
-  if ((millis() - lastDebounceTime) > debounceDelay) { //if the new reading has remained stable for long enough
-
-    if (heatCallReading != heatCall) {                 //see if it matches the prevous status. If it's different,
-      heatCall = heatCallReading;                      //then status has really changed. Reset the status.
-
-      Serial.print ("HeatCall is now = ");
-      Serial.println (heatCall);
-      delay(1000);
-    }
-  }
-
-  lastHeatCallReading = heatCallReading;  // reset the reading to use as future comparison
-
+void handleHeatCall(int heatCall) {
   Serial.print ("heatCall after debounce = ");
   Serial.println (heatCall);
   delay(2000);
@@ -119,4 +94,35 @@ void loop() {
     digitalWrite(rlyCloseVent, LOW);  //stop closing the vent
   }
 
+}
+
+
+void loop() {
+
+  //int ventCall= digitalRead(otherCallPin);
+  //int maxOpenLimitSwReading = digitalRead(maxOpenLimitSw);
+  //int maxClosedLimitSwReading = digitalRead();
+  //int midLimitSwReading = digitalRead();
+
+  // check for heat call, debounce signal
+
+  int heatCallReading = digitalRead(heatCallPin);
+  if (heatCallReading != lastHeatCallReading) {       //if the pin's reading does not match previous reading, record the time
+    lastDebounceTime = millis();
+  }
+  if ((millis() - lastDebounceTime) > debounceDelay) { //if the new reading has remained stable for long enough
+
+    if (heatCallReading != heatCall) {                 //see if it matches the prevous status. If it's different,
+      heatCall = heatCallReading;                      //then status has really changed. Reset the status.
+
+      Serial.print ("HeatCall is now = ");
+      Serial.println (heatCall);
+      // delay(1000);
+
+      // Code to be debounced:
+      handleHeatCall(heatCall);
+    }
+  }
+
+  lastHeatCallReading = heatCallReading;  // reset the reading to use as future comparison
 }
