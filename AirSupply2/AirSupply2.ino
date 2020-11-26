@@ -1,18 +1,20 @@
-// This sketch operates a fresh air vent. The fresh air resupplies the house from exhaust fans and combustion air.
-// Arduino's heat call pin should be connected to Normally Open side of the furnace switch/relay.
-// When there is a furnace call for heat, the furnace relay closes and heatCallReading will read HIGH.
-// Arduino also opens the vent if there is a call from exhaust fans.
-//
-// Vent position is determined by three magnetic switches attached to the vent door. Signals are sent to Arduino.
-// Vent door overtravel is prevented by two mechanical roller microswitches (one on each side) wired with the relays.
-//
-// The signal from the furnace is sent from a solenoid relay, which can send "dirty" signals that need debouncing.
+/*
+ * This sketch operates a fresh air vent. The fresh air resupplies the house from exhaust fans and combustion air.
+ * Arduino's heat call pin should be connected to Normally Open side of the furnace switch/relay.
+ * When there is a furnace call for heat, the furnace relay closes and heatCallReading will read HIGH.
+ * Arduino also opens the vent if there is a call from exhaust fans.
+ *
+ * Vent position is determined by three magnetic switches attached to the vent door. Signals are sent to Arduino.
+ * Vent door overtravel is prevented by two mechanical roller microswitches (one on each side) wired with the relays.
+ *
+ * The signal from the furnace is sent from a solenoid relay, which can send "dirty" signals that need debouncing.
+ *
+ * When first turned on, the arduino attempts to determine if the vent is open, closed, or in the middle
+ *
+ */
 
-// When first turned on, the arduino attempts to determine if the vent is open, closed, or in the middle
 
-
-// vars
-// pins
+// Pin Values:
 // const int otherCallPin = 4;      // digital pin number, input from non-furnace needs for air. Sets the ventCall value
 const int heatCallPin = 5;      // digital pin number, input from heat call relay
 const int maxOpenLimitSw = 6;   // max open limit switch. Switch (NC) opens when vent is open at max. LOW when vent is open, HIGH when closed.
@@ -38,11 +40,11 @@ unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
 unsigned long debounceDelay = 10000;   // the debounce time; increase if the output flickers
 
 void setup() {
-  pinMode(heatCallPin, INPUT);      // HIGH when there is a call from the furnace for heat
-  //  pinMode(otherCallPin, INPUT);     // Not yet used
-  pinMode(maxOpenLimitSw, INPUT);   // LOW when vent is fully open, else HIGH
-  pinMode(maxClosedLimitSw, INPUT); // LOW when vent is fully closed, else HIGH
-  // pinMode(midLimitSw, INPUT);       // LOW when vent is half open, else HIGH
+  pinMode(heatCallPin, INPUT);       // HIGH when there is a call from the furnace for heat
+  // pinMode(otherCallPin, INPUT);  // Not yet used
+  pinMode(maxOpenLimitSw, INPUT);    // LOW when vent is fully open, else HIGH
+  pinMode(maxClosedLimitSw, INPUT);  // LOW when vent is fully closed, else HIGH
+  // pinMode(midLimitSw, INPUT);     // LOW when vent is half open, else HIGH
 
 
   pinMode(rlyOpenVent, OUTPUT);
@@ -64,31 +66,31 @@ void setup() {
 }
 
 void handleHeatCall(int heatCall) {
-  Serial.print ("heatCall after debounce = ");
-  Serial.println (heatCall);
+  Serial.print("heatCall after debounce = ");
+  Serial.println(heatCall);
   delay(2000);
 
   // respond to heatcall
 
   if (heatCall == HIGH and digitalRead(maxClosedLimitSw) == LOW) {  //call for heat, vent is closed
-    Serial.print ("vent started opening at ");
-    Serial.println (millis());
+    Serial.print("vent started opening at ");
+    Serial.println(millis());
     while (digitalRead(maxOpenLimitSw) == HIGH) {
       digitalWrite(rlyOpenVent, HIGH);  //open the vent
     }
-    Serial.print ("vent is now opened at ");
-    Serial.println (millis());
+    Serial.print("vent is now opened at ");
+    Serial.println(millis());
     digitalWrite(rlyOpenVent, LOW);  //stop opening the vent
   }
 
   if (heatCall == LOW and digitalRead(maxOpenLimitSw) == LOW) {     //no call for heat, vent is open
-    Serial.print ("vent started closing at ");
-    Serial.println (millis());
+    Serial.print("vent started closing at ");
+    Serial.println(millis());
     while (digitalRead(maxClosedLimitSw) == HIGH) {
       digitalWrite(rlyCloseVent, HIGH);  //close the vent
     }
-    Serial.print ("vent is now closed at ");
-    Serial.println (millis());
+    Serial.print("vent is now closed at ");
+    Serial.println(millis());
     digitalWrite(rlyCloseVent, LOW);  //stop closing the vent
   }
 
